@@ -13,6 +13,11 @@ export const globalStyles = StyleSheet.create({
     shadowRadius: 8,
     shadowOffset: { width: 0, height: 2 },
     overflow: "hidden",
-  }
-
+  },
+  logo: {
+    width: 150,
+    height: 50,
+    alignSelf: 'center',
+    marginBottom: 16,
+  },
 });

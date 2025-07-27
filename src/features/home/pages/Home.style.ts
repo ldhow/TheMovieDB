@@ -38,4 +38,29 @@ export const styles = StyleSheet.create({
     
     fontWeight: '600',
   },
+  errorContainer: {
+    padding: 12,
+    borderRadius: 8,
+    backgroundColor: 'red',
+    alignItems: 'center',
+  },
+  errorText: {
+    color: 'white',
+    fontWeight: '600',
+  },
+  noMoviesContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 16,
+  },
+  noMoviesText: {
+    fontSize: 16,
+    color: 'gray',
+    textAlign: 'center',
+  },
+  movieList: {
+    gap: 16,
+    marginBottom: 48,
+  }
 });

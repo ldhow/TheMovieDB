@@ -3,19 +3,16 @@ import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import {
-  HomeStackParamList,
-  WatchlistStackParamList,
-} from "~/types/navigation";
-import { FontAwesome6 } from "@react-native-vector-icons/fontawesome6";
-import { DetailsScreen, HomeScreen } from "~/features/home/pages";
+import { HomeStackParamList } from "~/types/navigation";
+import { HomeScreen } from "~/features/home/pages";
 import WatchlistScreen from "~/features/watchlist/pages/Watchlist";
 import { Colors } from "~/constants/colors";
 import { theme } from "~/theme";
+import { DetailsScreen } from "~/features/details/pages";
+import { Header, TabBarIcon } from "~/components";
 
 const Tab = createBottomTabNavigator();
 const HomeStack = createNativeStackNavigator<HomeStackParamList>();
-const WatchlistStack = createNativeStackNavigator<WatchlistStackParamList>();
 
 function HomeStackNavigator() {
   return (
@@ -26,45 +23,18 @@ function HomeStackNavigator() {
   );
 }
 
-function WatchlistStackNavigator() {
-  return (
-    <WatchlistStack.Navigator screenOptions={{ headerShown: false }}>
-      <WatchlistStack.Screen name="Watchlist" component={WatchlistScreen} />
-    </WatchlistStack.Navigator>
-  );
-}
-
-const HouseIcon = ({
-  color,
-  size,
-}: {
-  focused: boolean;
-  color: string;
-  size: number;
-}) => <FontAwesome6 name="house" size={size} color={color} iconStyle="solid" />;
-const BookmarkIcon = ({
-  color,
-  size,
-}: {
-  focused: boolean;
-  color: string;
-  size: number;
-}) => (
-  <FontAwesome6 name="bookmark" size={size} color={color} iconStyle="solid" />
-);
-
 export default function AppRoutes() {
   return (
     <NavigationContainer theme={theme}>
       <Tab.Navigator
         screenOptions={{
-          headerShown: false,
+          header: () => <Header />,
           tabBarShowLabel: false,
           tabBarStyle: {
             backgroundColor: Colors.darkBlue,
             borderTopWidth: 0,
           },
-          tabBarActiveTintColor: Colors.yellow,
+          tabBarActiveTintColor: Colors.primary,
           tabBarInactiveTintColor: Colors.white,
           tabBarIconStyle: {
             marginTop: 8,
@@ -72,17 +42,17 @@ export default function AppRoutes() {
         }}
       >
         <Tab.Screen
-          name="Home"
+          name="HomeTab"
           component={HomeStackNavigator}
           options={{
-            tabBarIcon: HouseIcon,
+            tabBarIcon: (props) => <TabBarIcon {...props} name="house" />,
           }}
         />
         <Tab.Screen
           name="Watchlist"
-          component={WatchlistStackNavigator}
+          component={WatchlistScreen}
           options={{
-            tabBarIcon: BookmarkIcon,
+            tabBarIcon: (props) => <TabBarIcon {...props} name="bookmark" />,
           }}
         />
       </Tab.Navigator>

@@ -1,102 +1,85 @@
-import React, { use, useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  FlatList,
-  TouchableOpacity,
-  SafeAreaView,
-} from "react-native";
+import React from "react";
+import { View, Image, SafeAreaView } from "react-native";
 import { styles } from "./Home.style";
-import MovieCard from "../components/MovieCard";
 import { StyledDropdown, StyledButton, StyledTextInput } from "~/components";
-import { useNavigation, useRoute } from "@react-navigation/native";
-import { HomeStackParamList } from "~/types/navigation";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-
-const sampleMovies = [
-  {
-    id: "1",
-    title: "Barbie",
-    date: "19 July 2023",
-    description: "Barbie and Ken are having the time of their lives...",
-    image: "https://image.tmdb.org/t/p/w500//iuFNMS8U5cb6xfzi51Dbkovj7vM.jpg",
-  },
-  {
-    id: "2",
-    title: "The Flash",
-    date: "13 June 2023",
-    description: "When his attempt to save his family inadvertently alters...",
-    image: "https://image.tmdb.org/t/p/w500//rktDFPbfHfUbArZ6OOOKsXcv0Bm.jpg",
-  },
-  {
-    id: "3",
-    title: "The Little Mermaid",
-    date: "2023",
-    description: "A young mermaid makes a deal with a sea witch...",
-    image: "https://image.tmdb.org/t/p/w500//ym1dxyOk4jFcSl4Q2zmRrA5BEEN.jpg",
-  },
-];
-
-type Navigation = NativeStackNavigationProp<HomeStackParamList, "Home">;
+import { useNavigation } from "@react-navigation/native";
+import { HomeNavigation } from "~/types/navigation";
+import { useMovieActions } from "../stores/useMovieStores";
+import {
+  listMovieCategorys,
+  listOrderTypes,
+  mapMovieCategorys,
+  mapOrderTypes,
+} from "~/constants/values";
+import { IMovieCategory, IOrderType } from "~/types/model";
+import { useMovieList, usePendingMovieFilters } from "../hooks";
+import { MovieList } from "../components";
 
 const HomeScreen = () => {
-  const [category, setCategory] = useState("now_playing");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [openCategory, setOpenCategory] = useState(false);
-  const [items, setItems] = useState([
-    { label: "Now Playing", value: "now_playing" },
-    { label: "Upcoming", value: "upcoming" },
-    { label: "Popular", value: "popular" },
-  ]);
-  const navigation = useNavigation<Navigation>();
-  const handleClick = (value: string) => {
+  const navigation = useNavigation<HomeNavigation>();
+  const { nextPage } = useMovieActions();
+  const {
+    pendingCategory,
+    setPendingCategory,
+    pendingOrderType,
+    setPendingOrderType,
+    pendingSearchQuery,
+    setPendingSearchQuery,
+    hasChanged,
+    applyChanges,
+  } = usePendingMovieFilters();
+  const { movies, error, isNoMovies, isError, isLoading } = useMovieList();
+
+  const navigateToDetails = (value: number) => {
     navigation.push("Details", { id: value });
   };
 
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.container}>
-        <Image
-          source={require("~/assets/images/logo.png")}
-          style={styles.logo}
-          resizeMode="contain"
+        {/* Movie category */}
+        <StyledDropdown
+          options={listMovieCategorys}
+          selected={pendingCategory}
+          displayText={(item) => mapMovieCategorys[item]}
+          onSelect={(value: IMovieCategory) => setPendingCategory(value)}
+          extractKey={(item) => item}
         />
 
-        {/* Dropdown */}
+        {/* Order by */}
         <StyledDropdown
-          options={items.map((item) => item.label)}
-          selected={category}
-          onSelect={(value) => setCategory(value)}
-        />
-
-        <StyledDropdown
-          options={items.map((item) => item.label)}
-          selected={category}
-          onSelect={(value) => setCategory(value)}
+          options={listOrderTypes}
+          selected={pendingOrderType}
+          displayText={(item) => mapOrderTypes[item]}
+          onSelect={(value: IOrderType) => setPendingOrderType(value)}
+          extractKey={(item) => item}
           placeholder="Order by"
         />
 
         {/* Search */}
         <StyledTextInput
-          value={searchQuery}
-          onChangeText={(text) => setSearchQuery(text)}
+          value={pendingSearchQuery}
+          onChangeText={(text) => setPendingSearchQuery(text)}
           placeholder="Search..."
         />
+
+        {/* Search button */}
         <StyledButton
           title="Search"
-          onPress={() => {}}
-          disabled={!searchQuery}
+          onPress={applyChanges}
+          disabled={!hasChanged}
           radius={"full"}
         />
 
-        {/* Movie List */}
-        <FlatList
-          data={sampleMovies}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => <MovieCard movie={item} onPress={() => handleClick(item.id)} />}
-          contentContainerStyle={{ paddingBottom: 100, gap: 16 }}
+        {/* render movie list */}
+        <MovieList
+          movies={movies}
+          isLoading={isLoading}
+          isError={isError}
+          error={error}
+          isNoMovies={isNoMovies}
+          nextPage={nextPage}
+          navigateToDetails={navigateToDetails}
         />
       </View>
     </SafeAreaView>
